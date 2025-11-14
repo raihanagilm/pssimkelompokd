@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard Eksekutif – Batik Trusmi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8A2BE2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --bg-light: #f5f7fa;
+            --text: #333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin: 6px 10px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 24px;
+            width: calc(100% - 240px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Responsive Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Card/Widget styling */
+        .widget {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .metric-label {
+            color: #666;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-ok {
+            color: var(--success);
+        }
+
+        .status-warning {
+            color: var(--warning);
+        }
+
+        .chart-container {
+            flex: 1;
+            min-height: 180px;
+            margin-top: 12px;
+        }
+
+        .footer {
+            text-align: right;
+            font-size: 13px;
+            color: #666;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Large widget takes 2 columns */
+        .large-widget {
+            grid-column: 1 / -1;
+        }
+
+        /* Ensure responsiveness on zoom */
+        @media (min-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .large-widget {
+                grid-column: span 3;
+            }
+        }
+
+        @media (max-width: 1199px) and (min-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .large-widget {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .logo h1,
+            .sidebar .logo small,
+            .sidebar .nav-item span {
+                display: none;
+            }
+            .sidebar .nav-item {
+                justify-content: center;
+                padding: 16px 0;
+            }
+            .sidebar .nav-item i {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+                padding: 16px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Batik Trusmi</h1>
+                <small>DASHBOARD EKSEKUTIF</small>
+            </div>
+            <a href="index.html" class="nav-item active">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="sales.html" class="nav-item">
+                <i class="fas fa-chart-line"></i> <span>Sales</span>
+            </a>
+            <a href="inventory.html" class="nav-item">
+                <i class="fas fa-boxes"></i> <span>Inventory</span>
+            </a>
+            <a href="customers.html" class="nav-item">
+                <i class="fas fa-users"></i> <span>Pelanggan</span>
+            </a>
+            <a href="security.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i> <span>Keamanan</span>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>DASHBOARD EKSEKUTIF BATIK TRUSMI</h1>
+                <div><i class="fas fa-bell" style="font-size: 20px; color: #555;"></i></div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- REAL-TIME SALES -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">PENJUALAN REAL-TIME</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Online:</span>
+                        <span class="metric-value">Rp 25,6jt</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Offline:</span>
+                        <span class="metric-value">Rp 18,3jt</span>
+                    </div>
+                </div>
+
+                <!-- INVENTORY STATUS -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">STATUS INVENTORI</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Stok Rendah:</span>
+                        <span class="metric-value status-warning">15 item</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Akurasi Stok:</span>
+                        <span class="metric-value status-ok">98,5% ✓</span>
+                    </div>
+                </div>
+
+                <!-- CUSTOMER SATISFACTION -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KEPUASAN PELANGGAN</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Rating Rata-rata:</span>
+                        <span class="metric-value">4,8/5,0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Keluhan:</span>
+                        <span class="metric-value">3</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Waktu Respons:</span>
+                        <span class="metric-value">< 2 jam</span>
+                    </div>
+                </div>
+
+                <!-- PERFORMANCE KPIS -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KINERJA UTAMA (KPI)</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Penjualan Digital:</span>
+                        <span class="metric-value status-ok">63% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Waktu Pemrosesan:</span>
+                        <span class="metric-value status-ok">0,8 hari ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Pelatihan SDM:</span>
+                        <span class="metric-value">75%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Rating Pelanggan:</span>
+                        <span class="metric-value status-ok">4,6/5 ✓</span>
+                    </div>
+                </div>
+
+                <!-- SYSTEM HEALTH -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KESEHATAN SISTEM</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Uptime Server:</span>
+                        <span class="metric-value status-ok">99,97% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Status Keamanan:</span>
+                        <span class="metric-value status-ok">AMAN ✓</span>
+                    </div>
+                </div>
+
+                <!-- SALES TREND CHART -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">TREN PENJUALAN (30 Hari Terakhir)</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                Terakhir Diperbarui: Jumat, 14 November 2025, pukul 14.30 WIB | Status Sistem: <span class="status-ok">OPTIMAL</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sales Trend Chart
+        const ctx = document.getElementById('salesTrendChart').getContext('2d');
+        const labels = Array.from({length: 30}, (_, i) => `Hari ${i+1}`);
+        const onlineData = [18, 20, 22, 21, 23, 25, 24, 26, 25, 27, 26, 28, 27, 29, 28, 30, 29, 31, 30, 32, 31, 33, 32, 34, 33, 35, 34, 36, 35, 37];
+        const offlineData = [15, 16, 17, 16, 18, 17, 19, 18, 20, 19, 21, 20, 22, 21, 23, 22, 24, 23, 25, 24, 26, 25, 27, 26, 28, 27, 29, 28, 30, 31];
+
+        new Chart(ctx, {
+            type: 'line',
+             data:{
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Penjualan Online (juta Rp)',
+                         onlineData,
+                        borderColor: '#6A0DAD',
+                        data:[18, 19, 21, 20, 22, 24, 23, 25, 24, 26, 25, 27, 26, 28, 27, 29, 28, 30, 29, 31, 30, 32, 31, 33, 32, 34, 33, 35, 34, 36],
+                        backgroundColor: 'rgba(106,13,173,0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Penjualan Offline (juta Rp)',
+                         offlineData,
+                        data:[15, 14, 16, 15, 17, 16, 18, 17, 19, 18, 20, 19, 21, 20, 22, 21, 23, 22, 24, 23, 25, 24, 26, 25, 27, 26, 28, 27, 29, 30],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40,167,69,0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                family: "'Poppins', sans-serif",
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Penjualan (juta Rupiah)',
+                            font: {
+                                family: "'Poppins', sans-serif",
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

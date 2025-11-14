@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Analitik Penjualan – Batik Trusmi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8A2BE2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --bg-light: #f5f7fa;
+            --text: #333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin: 6px 10px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.25); }
+        .nav-item.active { background: rgba(255,255,255,0.35); }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 24px;
+            width: calc(100% - 240px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-control {
+            display: flex;
+            flex-direction: column;
+            font-size: 13px;
+        }
+
+        .filter-control label {
+            margin-bottom: 4px;
+            color: #555;
+        }
+
+        .filter-control select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .widget {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .metric-label {
+            color: #666;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-ok {
+            color: var(--success);
+        }
+
+        .chart-container {
+            flex: 1;
+            min-height: 180px;
+            margin-top: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .insight-box {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            border-left: 4px solid var(--success);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .large-widget {
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive rules */
+        @media (min-width: 1200px) {
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+            .large-widget { grid-column: span 2; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo h1, .sidebar .logo small, .sidebar .nav-item span { display: none; }
+            .sidebar .nav-item { justify-content: center; padding: 16px 0; }
+            .sidebar .nav-item i { margin-right: 0; font-size: 20px; }
+            .main-content { margin-left: 70px; width: calc(100% - 70px); padding: 16px; }
+            .header h1 { font-size: 20px; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Batik Trusmi</h1>
+                <small>DASHBOARD EKSEKUTIF</small>
+            </div>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="sales.html" class="nav-item active">
+                <i class="fas fa-chart-line"></i> <span>Sales</span>
+            </a>
+            <a href="inventory.html" class="nav-item">
+                <i class="fas fa-boxes"></i> <span>Inventory</span>
+            </a>
+            <a href="customers.html" class="nav-item">
+                <i class="fas fa-users"></i> <span>Pelanggan</span>
+            </a>
+            <a href="security.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i> <span>Keamanan</span>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>ANALITIK KINERJA PENJUALAN</h1>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar">
+                <div class="filter-control">
+                    <label>Periode:</label>
+                    <select><option>30 Hari Terakhir</option></select>
+                </div>
+                <div class="filter-control">
+                    <label>Kanal:</label>
+                    <select><option>Semua Kanal</option></select>
+                </div>
+                <div class="filter-control">
+                    <label>Bandingkan Dengan:</label>
+                    <select><option>Periode Sebelumnya</option></select>
+                </div>
+                <div class="filter-control">
+                    <label>Mode Tampilan:</label>
+                    <select><option>Harian</option></select>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- SALES SUMMARY -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">RINGKASAN PENJUALAN</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Pendapatan:</span>
+                        <span class="metric-value">Rp 43,9jt</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Pencapaian Target:</span>
+                        <span class="metric-value status-ok">92% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Nilai Rata-rata Pesanan:</span>
+                        <span class="metric-value">Rp 425rb</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Tingkat Konversi:</span>
+                        <span class="metric-value">3,8%</span>
+                    </div>
+                </div>
+
+                <!-- CHANNEL PERFORMANCE -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KINERJA PER KANAL</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Website E-commerce:</span>
+                        <span class="metric-value">Rp 25,6jt (58,3%)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Toko Fisik:</span>
+                        <span class="metric-value">Rp 18,3jt (41,7%)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Marketplace:</span>
+                        <span class="metric-value">Rp 8,7jt (19,8%)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Pertumbuhan Online:</span>
+                        <span class="metric-value status-ok">+24% YoY</span>
+                    </div>
+                </div>
+
+                <!-- REVENUE TREND & FORECAST -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">TREN & PROYEKSI PENDAPATAN</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="insight-box">
+                        • Puncak penjualan terjadi di akhir pekan (Sabtu 25% lebih tinggi dari rata-rata)<br>
+                        • Penjualan online tumbuh 15% per bulan<br>
+                        • Diproyeksikan melebihi target Q4 sebesar 8%
+                    </div>
+                </div>
+
+                <!-- TOP PRODUCTS -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">PRODUK TERLARIS</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Produk</th>
+                                <th>Pendapatan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Koleksi Mega Mendung</td><td>Rp 17,4jt</td></tr>
+                            <tr><td>2</td><td>Singa Barong Premium</td><td>Rp 11,8jt</td></tr>
+                            <tr><td>3</td><td>Naga Sakti Limited</td><td>Rp 9,0jt</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- SALES TEAM -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KINERJA TIM PENJUALAN</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Pencapaian Terbaik:</span>
+                        <span class="metric-value">Ahmad (Rp 8,2jt)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Rata-rata Tim:</span>
+                        <span class="metric-value">Rp 4,5jt/orang</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Pencapaian Target:</span>
+                        <span class="metric-value status-ok">95%</span>
+                    </div>
+                </div>
+
+                <!-- GEOGRAPHIC SALES -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">DISTRIBUSI PENJUALAN GEOGRAFIS</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 13px; line-height: 1.5;">
+                        • Provinsi Teratas: Jawa Barat (35%)<br>
+                        • Pertumbuhan Tercepat: Jakarta (+45% YoY)<br>
+                        • Pasar Ekspor: Malaysia (12%), Singapura (8%), AS (5%)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Revenue Trend Chart
+        const ctx1 = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+             data:{
+                labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+                datasets: [
+                    {
+                        label: 'Aktual',
+                         data:[38, 40, 42, 43.9],
+                        borderColor: '#6A0DAD',
+                        backgroundColor: 'rgba(106,13,173,0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Target',
+                         data:[40, 42, 44, 45],
+                        borderColor: '#ffc107',
+                        borderDash: [5, 5],
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Proyeksi',
+                         data:[43.9, 46, 48, 50],
+                        borderColor: '#28a745',
+                        borderDash: [5, 5],
+                        fill: false,
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: "'Poppins', sans-serif", size: 12 } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Pendapatan (juta Rupiah)',
+                            font: { family: "'Poppins', sans-serif", size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Geographic Chart
+        const ctx2 = document.getElementById('geoChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+             data:{
+                labels: ['Jawa Barat', 'Jakarta', 'Jawa Tengah', 'Jawa Timur', 'Luar Jawa'],
+                datasets: [{
+                    label: 'Distribusi Penjualan (%)',
+                     data:[35, 25, 15, 12, 13],
+                    backgroundColor: '#6A0DAD'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 50,
+                        title: {
+                            display: true,
+                            text: 'Persentase (%)',
+                            font: { family: "'Poppins', sans-serif", size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
