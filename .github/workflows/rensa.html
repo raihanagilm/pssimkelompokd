@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batik Trusmi Executive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8A2BE2;
+            --accent: #FF6B35;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --bg-light: #f5f7fa;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            transition: var(--transition);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-subtext {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .nav-menu {
+            padding: 0 15px;
+        }
+
+        .nav-title {
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin: 20px 0 10px;
+            opacity: 0.8;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-item.active {
+            background: white;
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            width: 30px;
+            text-align: center;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .widget {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .widget-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .widget-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .widget-icon.sales { background: rgba(106, 13, 173, 0.1); color: var(--primary); }
+        .widget-icon.inventory { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .widget-icon.customers { background: rgba(23, 162, 184, 0.1); color: var(--info); }
+        .widget-icon.kpi { background: rgba(255, 107, 53, 0.1); color: var(--accent); }
+        .widget-icon.security { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+
+        .widget-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .metric-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 15px;
+        }
+
+        /* Large Widget */
+        .large-widget {
+            grid-column: span 2;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table tr:hover {
+            background: rgba(106, 13, 173, 0.05);
+        }
+
+        .status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-ok {
+            background: rgba(40, 167, 69, 0.15);
+            color: var(--success);
+        }
+
+        .status-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: var(--warning);
+        }
+
+        .status-danger {
+            background: rgba(220, 53, 69, 0.15);
+            color: var(--danger);
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: var(--secondary);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 14px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            .logo-text, .nav-text, .nav-title {
+                display: none;
+            }
+            .logo {
+                justify-content: center;
+                padding: 15px 0;
+            }
+            .logo-icon {
+                margin-right: 0;
+            }
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            .nav-icon {
+                margin-right: 0;
+                font-size: 20px;
+            }
+            .main-content {
+                margin-left: 80px;
+            }
+            .large-widget {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .large-widget {
+                grid-column: span 1;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Alert System */
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: rgba(23, 162, 184, 0.1);
+            border-left: 4px solid var(--info);
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid var(--success);
+        }
+
+        /* Priority Badges */
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .priority-high {
+            background: rgba(220, 53, 69, 0.15);
+            color: var(--danger);
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.15);
+            color: var(--warning);
+        }
+
+        .priority-low {
+            background: rgba(40, 167, 69, 0.15);
+            color: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">BT</div>
+                <div class="logo-text">
+                    BATIK TRUSMI<br>
+                    <span class="logo-subtext">EXECUTIVE DASHBOARD</span>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-title">NAVIGASI UTAMA</div>
+                
+                <div class="nav-item active">
+                    <div class="nav-icon"><i class="fas fa-home"></i></div>
+                    <div class="nav-text">Dashboard</div>
+                </div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="nav-text">Sales Analytics</div>
+                </div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-boxes"></i></div>
+                    <div class="nav-text">Inventory Management</div>
+                </div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-users"></i></div>
+                    <div class="nav-text">Customer CRM</div>
+                </div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="nav-text">Security Monitor</div>
+                </div>
+                
+                <div class="nav-title" style="margin-top: 25px">ROADMAP PRIORITAS</div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-star"></i></div>
+                    <div class="nav-text">Prioritas 1 <span class="priority-badge priority-high">Fondasi</span></div>
+                </div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-star"></i></div>
+                    <div class="nav-text">Prioritas 2 <span class="priority-badge priority-medium">Integrasi</span></div>
+                </div>
+                
+                <div class="nav-item">
+                    <div class="nav-icon"><i class="fas fa-star"></i></div>
+                    <div class="nav-text">Prioritas 3 <span class="priority-badge priority-low">Pertumbuhan</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="page-title">Executive Dashboard <span class="priority-badge priority-high">Prioritas 1</span></div>
+                <div class="user-info">
+                    <div class="notification">
+                        <i class="fas fa-bell" style="font-size: 20px; cursor: pointer;"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+
+            <!-- System Status Alert -->
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+                <div>
+                    <strong>Sistem Beroperasi Optimal</strong> - Semua target Prioritas 1 tercapai: Infrastruktur stabil (Uptime 99.97%), Keamanan sistem aktif, dan 85% SDM telah mengikuti pelatihan digital.
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Real-time Sales Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Real-time Sales</div>
+                        <div class="widget-icon sales">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Online Sales (Today)</div>
+                                <div class="metric-value">Rp 25.6jt</div>
+                            </div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +15.3%
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Offline Sales (Today)</div>
+                                <div class="metric-value">Rp 18.3jt</div>
+                            </div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +8.7%
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Digital Sales Ratio</div>
+                                <div class="metric-value">63%</div>
+                            </div>
+                            <div class="metric-trend trend-up" style="color: var(--success);">
+                                <i class="fas fa-check-circle"></i> Target ≥60% ✓
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Status Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Inventory Status</div>
+                        <div class="widget-icon inventory">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Total Items</div>
+                                <div class="metric-value">12,450</div>
+                            </div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +2.1%
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Low Stock Items</div>
+                                <div class="metric-value">15</div>
+                            </div>
+                            <div class="metric-trend trend-down" style="color: var(--warning);">
+                                <i class="fas fa-exclamation-triangle"></i> Attention Required
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Stock Accuracy</div>
+                                <div class="metric-value">98.5%</div>
+                            </div>
+                            <div class="metric-trend trend-up" style="color: var(--success);">
+                                <i class="fas fa-check-circle"></i> Target ≥95% ✓
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>Item</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>BT001</td>
+                                        <td>Mega Mendung Premium</td>
+                                        <td><span class="status status-ok">OK</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>BT002</td>
+                                        <td>Singa Payung</td>
+                                        <td><span class="status status-warning">LOW STOCK</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>BT003</td>
+                                        <td>Naga Sakti</td>
+                                        <td><span class="status status-ok">OK</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="action-group">
+                            <button class="action-btn"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                            <button class="action-btn" style="background: var(--accent);"><i class="fas fa-shopping-cart"></i> Reorder</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Satisfaction Widget -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Customer Satisfaction</div>
+                        <div class="widget-icon customers">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Average Rating</div>
+                                <div class="metric-value">4.8/5.0</div>
+                            </div>
+                            <div class="metric-trend trend-up" style="color: var(--success);">
+                                <i class="fas fa-check-circle"></i> Target ≥4.5 ✓
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Active Members</div>
+                                <div class="metric-value">4,230</div>
+                            </div>
+                            <div class="metric-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> +12.5%
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Complaints (Today)</div>
+                                <div class="metric-value">3</div>
+                            </div>
+                            <div class="metric-trend trend-down" style="color: var(--success);">
+                                <i class="fas fa-arrow-down"></i> -25%
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div>
+                                <div class="metric-label">Response Time</div>
+                                <div class="metric-value">< 2 hours</div>
+                            </div>
+                            <div class="metric-trend trend-up" style="color: var(--success);">
+                                <i class="fas fa-check-circle"></i> Excellent
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="customerChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance KPIs Widget -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Performance KPIs <span class="priority-badge priority-high">Prioritas 1 & 2</span></div>
+                        <div class="widget-icon kpi">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                            <div style="text-align: center; padding: 15px; background: rgba(106, 13, 173, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Digital Sales Ratio</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--primary);">63%</div>
+                                <div style="color: var(--success); font-weight: 500;">✓ Target ≥60% Achieved</div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 15px; background: rgba(40, 167, 69, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Order Processing Time</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--success);">0.8 days</div>
+                                <div style="color: var(--success); font-weight: 500;">✓ Target ≤1 day Achieved</div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 15px; background: rgba(23, 162, 184, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Staff Training</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--info);">85%</div>
+                                <div style="color: var(--success); font-weight: 500;">✓ Target ≥80% Achieved</div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 15px; background: rgba(220, 53, 69, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">System Uptime</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--danger);">99.97%</div>
+                                <div style="color: var(--success); font-weight: 500;">✓ Target ≥99% Achieved</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="kpiChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Security Widget -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">System Security & Health <span class="priority-badge priority-high">Prioritas 1</span></div>
+                        <div class="widget-icon security">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="widget-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                            <div style="text-align: center; padding: 15px; background: rgba(23, 162, 184, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Security Status</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--success);">SECURE ✓</div>
+                                <div style="color: var(--success); font-weight: 500;">No incidents today</div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 15px; background: rgba(255, 107, 53, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Blocked Attacks</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--accent);">24</div>
+                                <div style="color: var(--warning); font-weight: 500;">Today's protection</div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 15px; background: rgba(40, 167, 69, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">Data Encryption</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--success);">100% ✓</div>
+                                <div style="color: var(--success); font-weight: 500;">All customer data secured</div>
+                            </div>
+                            
+                            <div style="text-align: center; padding: 15px; background: rgba(106, 13, 173, 0.05); border-radius: 10px;">
+                                <div style="font-size: 14px; color: var(--gray); margin-bottom: 8px;">2FA Coverage</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--primary);">100% ✓</div>
+                                <div style="color: var(--success); font-weight: 500;">All staff enabled</div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Event</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>14:32:56</td>
+                                        <td>WAF blocked SQL injection attempt</td>
+                                        <td><span class="status status-warning">BLOCKED</span></td>
+                                        <td>Auto-resolved</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:30:21</td>
+                                        <td>Admin login from trusted device</td>
+                                        <td><span class="status status-ok">SUCCESS</span></td>
+                                        <td>Verified</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:25:18</td>
+                                        <td>SSL certificate auto-renewal</td>
+                                        <td><span class="status status-ok">COMPLETED</span></td>
+                                        <td>System event</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:15:44</td>
+                                        <td>Daily backup completed</td>
+                                        <td><span class="status status-ok">SUCCESS</span></td>
+                                        <td>2.4GB stored</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div>Batik Trusmi Executive Dashboard - TRUSMI INTEGRATED BUSINESS INTELLIGENCE (TIBI)</div>
+                <div style="margin-top: 5px; font-size: 13px; color: var(--dark);">
+                    Last Updated: Friday, November 14, 2025 at 14:30 WIB | Data refreshed automatically every 5 minutes
+                </div>
+                <div style="margin-top: 8px; font-size: 13px; color: var(--gray);">
+                    This dashboard is part of Prioritas 1 implementation: Infrastructure & Security Foundation (2025)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
+                    datasets: [
+                        {
+                            label: 'Online Sales (jt)',
+                            data: [8.2, 12.5, 15.8, 18.3, 21.5, 23.8, 25.6],
+                            borderColor: '#6A0DAD',
+                            backgroundColor: 'rgba(106, 13, 173, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Offline Sales (jt)',
+                            data: [5.1, 7.8, 10.2, 12.5, 15.1, 17.2, 18.3],
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Sales (juta Rupiah)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Customer Chart
+            const customerCtx = document.getElementById('customerChart').getContext('2d');
+            new Chart(customerCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['4-5 Stars', '3 Stars', '1-2 Stars'],
+                    datasets: [{
+                        data: [85, 12, 3],
+                        backgroundColor: [
+                            '#28a745',
+                            '#ffc107',
+                            '#dc3545'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // KPI Chart
+            const kpiCtx = document.getElementById('kpiChart').getContext('2d');
+            new Chart(kpiCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025 (Target)'],
+                    datasets: [
+                        {
+                            label: 'Digital Sales Ratio (%)',
+                            data: [45, 52, 63, 70],
+                            backgroundColor: 'rgba(106, 13, 173, 0.7)',
+                            borderColor: '#6A0DAD',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Order Processing Time (days)',
+                            data: [1.5, 1.2, 0.8, 0.5],
+                            backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                            borderColor: '#28a745',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Staff Training (%)',
+                            data: [45, 65, 85, 95],
+                            backgroundColor: 'rgba(23, 162, 184, 0.7)',
+                            borderColor: '#17a2b8',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Performance Metrics'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Sidebar hover effects
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(5px)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
