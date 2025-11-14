@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Keamanan Sistem – Batik Trusmi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8A2BE2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --bg-light: #f5f7fa;
+            --text: #333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin: 6px 10px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.25); }
+        .nav-item.active { background: rgba(255,255,255,0.35); }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 24px;
+            width: calc(100% - 240px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Security Status Panel */
+        .security-status {
+            background: #e8f5e9;
+            padding: 18px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-icon {
+            font-size: 28px;
+            color: var(--success);
+        }
+
+        .status-text {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 16px;
+        }
+
+        .status-sub {
+            font-size: 13px;
+            color: #555;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .widget {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .metric-label {
+            color: #666;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-ok {
+            color: var(--success);
+        }
+
+        .log-container {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .action-group {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .large-widget {
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive rules */
+        @media (min-width: 1200px) {
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+            .large-widget { grid-column: span 2; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo h1, .sidebar .logo small, .sidebar .nav-item span { display: none; }
+            .sidebar .nav-item { justify-content: center; padding: 16px 0; }
+            .sidebar .nav-item i { margin-right: 0; font-size: 20px; }
+            .main-content { margin-left: 70px; width: calc(100% - 70px); padding: 16px; }
+            .header h1 { font-size: 20px; }
+            .security-status { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Batik Trusmi</h1>
+                <small>DASHBOARD EKSEKUTIF</small>
+            </div>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="sales.html" class="nav-item">
+                <i class="fas fa-chart-line"></i> <span>Sales</span>
+            </a>
+            <a href="inventory.html" class="nav-item">
+                <i class="fas fa-boxes"></i> <span>Inventory</span>
+            </a>
+            <a href="customers.html" class="nav-item">
+                <i class="fas fa-users"></i> <span>Pelanggan</span>
+            </a>
+            <a href="security.html" class="nav-item active">
+                <i class="fas fa-shield-alt"></i> <span>Keamanan</span>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>PEMANTAUAN KEAMANAN & ADMINISTRASI SISTEM</h1>
+            </div>
+
+            <!-- Security Status Panel -->
+            <div class="security-status">
+                <div class="status-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div>
+                    <div class="status-text">STATUS KEAMANAN SISTEM: AMAN ✓</div>
+                    <div class="status-sub">
+                        • Audit Keamanan Terakhir: 14 Nov 2025 • Audit Berikutnya: 14 Des 2025<br>
+                        • Hari Sejak Insiden Terakhir: 187 • Skor Keamanan: 98/100
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- SECURITY MONITORING -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">PEMANTAUAN KEAMANAN</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Ancaman Aktif:</span>
+                        <span class="metric-value">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Serangan Diblokir:</span>
+                        <span class="metric-value">24</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Percobaan Login Hari Ini:</span>
+                        <span class="metric-value">168</span>
+                    </div>
+                    <div style="margin-left: 15px; font-size: 13px;">
+                        • Berhasil: 156<br>
+                        • Gagal: 12 (semua diblokir)
+                    </div>
+                </div>
+
+                <!-- ACCESS CONTROL -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KONTROL AKSES</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Pengguna:</span>
+                        <span class="metric-value">45</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Distribusi Peran:</span>
+                        <span class="metric-value"></span>
+                    </div>
+                    <div style="margin-left: 15px; font-size: 13px;">
+                        • Admin: 5<br>
+                        • Manajer: 8<br>
+                        • Staf: 32
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Verifikasi 2 Langkah:</span>
+                        <span class="metric-value status-ok">100% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Perubahan Password Terakhir:</span>
+                        <span class="metric-value">30 hari lalu</span>
+                    </div>
+                </div>
+
+                <!-- REAL-TIME SECURITY ALERTS -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">ALERT KEAMANAN REAL-TIME</div>
+                    </div>
+                    <div class="log-container">
+                        14:32:56 - WAF memblokir upaya injeksi SQL dari IP 103.28.xxx.xxx<br>
+                        14:30:21 - Login admin sukses dari perangkat tepercaya (User: Admin)<br>
+                        14:25:18 - Sertifikat SSL diperbarui otomatis<br>
+                        14:15:44 - Backup harian selesai (Ukuran: 2,4 GB)
+                    </div>
+                    <div class="action-group">
+                        <button class="action-btn">Lihat Log Lengkap</button>
+                        <button class="action-btn">Konfigurasi Alert</button>
+                        <button class="action-btn">Laporan Keamanan</button>
+                    </div>
+                </div>
+
+                <!-- COMPLIANCE STATUS -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">STATUS KEPATUHAN</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Kepatuhan GDPR:</span>
+                        <span class="metric-value status-ok">95% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">PCI DSS:</span>
+                        <span class="metric-value status-ok">98% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Enkripsi Data:</span>
+                        <span class="metric-value status-ok">100% ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Kebijakan Privasi:</span>
+                        <span class="metric-value status-ok">Diperbarui ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Log Audit:</span>
+                        <span class="metric-value status-ok">Lengkap ✓</span>
+                    </div>
+                </div>
+
+                <!-- BACKUP & DISASTER RECOVERY -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">BACKUP & PEMULIHAN BENCANA</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Backup Terakhir:</span>
+                        <span class="metric-value">Hari Ini, 02:00 WIB</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Ukuran Backup:</span>
+                        <span class="metric-value">2,4 GB</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Kebijakan Retensi:</span>
+                        <span class="metric-value">30 hari</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Uji Pemulihan:</span>
+                        <span class="metric-value status-ok">Minggu lalu ✓</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">RTO (Waktu Pemulihan):</span>
+                        <span class="metric-value">< 15 menit</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">RPO (Titik Pemulihan):</span>
+                        <span class="metric-value">< 5 menit</span>
+                    </div>
+                </div>
+
+                <!-- USER ACTIVITY & TRAINING -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">AKTIVITAS PENGGUNA & KEPATUHAN PELATIHAN</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Peran</th>
+                                <th>Pelatihan Terakhir</th>
+                                <th>Jadwal Berikutnya</th>
+                                <th>Status Kepatuhan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>John</td>
+                                <td>Admin</td>
+                                <td>15 Okt 2025</td>
+                                <td>15 Jan</td>
+                                <td>✓ Selesai</td>
+                            </tr>
+                            <tr>
+                                <td>Mary</td>
+                                <td>Sales</td>
+                                <td>20 Okt 2025</td>
+                                <td>20 Jan</td>
+                                <td>✓ Selesai</td>
+                            </tr>
+                            <tr>
+                                <td>Alex</td>
+                                <td>POS</td>
+                                <td>10 Nov 2025</td>
+                                <td>10 Feb</td>
+                                <td>⚠ Jatuh tempo dalam 90 hari</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="action-group">
+                        <button class="action-btn">Ekspor Laporan Pelatihan</button>
+                        <button class="action-btn">Jadwalkan Pelatihan</button>
+                        <button class="action-btn">Lihat Sertifikat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

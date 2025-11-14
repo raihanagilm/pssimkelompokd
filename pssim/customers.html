@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Hubungan Pelanggan – Batik Trusmi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #6A0DAD;
+            --secondary: #8A2BE2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --bg-light: #f5f7fa;
+            --text: #333;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin: 6px 10px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.25); }
+        .nav-item.active { background: rgba(255,255,255,0.35); }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 24px;
+            width: calc(100% - 240px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-control {
+            display: flex;
+            flex-direction: column;
+            font-size: 13px;
+        }
+
+        .filter-control label {
+            margin-bottom: 4px;
+            color: #555;
+        }
+
+        .filter-control input,
+        .filter-control select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .widget {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .widget-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .metric-label {
+            color: #666;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .chart-container {
+            flex: 1;
+            min-height: 180px;
+            margin-top: 12px;
+        }
+
+        .segment-box {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .segment-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .segment-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .segment-value {
+            font-size: 13px;
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .action-group {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .large-widget {
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive rules */
+        @media (min-width: 1200px) {
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+            .large-widget { grid-column: span 2; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 70px; }
+            .sidebar .logo h1, .sidebar .logo small, .sidebar .nav-item span { display: none; }
+            .sidebar .nav-item { justify-content: center; padding: 16px 0; }
+            .sidebar .nav-item i { margin-right: 0; font-size: 20px; }
+            .main-content { margin-left: 70px; width: calc(100% - 70px); padding: 16px; }
+            .header h1 { font-size: 20px; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .segment-box { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Batik Trusmi</h1>
+                <small>DASHBOARD EKSEKUTIF</small>
+            </div>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i> <span>Dashboard</span>
+            </a>
+            <a href="sales.html" class="nav-item">
+                <i class="fas fa-chart-line"></i> <span>Sales</span>
+            </a>
+            <a href="inventory.html" class="nav-item">
+                <i class="fas fa-boxes"></i> <span>Inventory</span>
+            </a>
+            <a href="customers.html" class="nav-item active">
+                <i class="fas fa-users"></i> <span>Pelanggan</span>
+            </a>
+            <a href="security.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i> <span>Keamanan</span>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>MANAJEMEN HUBUNGAN PELANGGAN (CRM)</h1>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar">
+                <div class="filter-control">
+                    <label>Cari Pelanggan:</label>
+                    <input type="text" placeholder="Nama/Email/Telepon...">
+                </div>
+                <div class="filter-control">
+                    <label>Segmentasi:</label>
+                    <select><option>Semua</option></select>
+                </div>
+                <div class="filter-control">
+                    <label>Tier Member:</label>
+                    <select><option>Semua Tier</option></select>
+                </div>
+                <div class="filter-control">
+                    <label>Rentang Tanggal:</label>
+                    <select><option>30 Hari Terakhir</option></select>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- CUSTOMER METRICS -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">METRIK PELANGGAN</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Pelanggan:</span>
+                        <span class="metric-value">15.680</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Pelanggan Baru (Bulan Ini):</span>
+                        <span class="metric-value">342</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Rating Rata-rata:</span>
+                        <span class="metric-value">4,7/5,0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Resolusi Keluhan:</span>
+                        <span class="metric-value">98%</span>
+                    </div>
+                </div>
+
+                <!-- LOYALTY PROGRAM PERFORMANCE -->
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KINERJA PROGRAM LOYALITAS</div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Member Aktif:</span>
+                        <span class="metric-value">4.230 (27%)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Rata-rata Poin:</span>
+                        <span class="metric-value">12.450</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Tingkat Penukaran:</span>
+                        <span class="metric-value">68%</span>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 13px;">
+                        <div><strong>Distribusi Tier:</strong></div>
+                        <div>• Silver: 65%</div>
+                        <div>• Gold: 25%</div>
+                        <div>• Platinum: 10%</div>
+                    </div>
+                </div>
+
+                <!-- CUSTOMER SEGMENTATION -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">SEGMENTASI & PERILAKU PELANGGAN</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                        <div class="chart-container">
+                            <canvas id="segmentChart"></canvas>
+                        </div>
+                        <div class="segment-box">
+                            <div class="segment-card">
+                                <div class="segment-title">High Value</div>
+                                <div class="segment-value">Pesanan Rata-rata: Rp 1,2jt</div>
+                                <div class="segment-value">Jumlah: 3.136</div>
+                            </div>
+                            <div class="segment-card">
+                                <div class="segment-title">Frequent</div>
+                                <div class="segment-value">Pesanan Rata-rata: Rp 450rb</div>
+                                <div class="segment-value">Jumlah: 2.450</div>
+                            </div>
+                            <div class="segment-card">
+                                <div class="segment-title">Baru</div>
+                                <div class="segment-value">Pesanan Rata-rata: Rp 320rb</div>
+                                <div class="segment-value">Jumlah: 1.890</div>
+                            </div>
+                            <div class="segment-card">
+                                <div class="segment-title">Berisiko</div>
+                                <div class="segment-value">Jumlah: 1.240</div>
+                                <div class="segment-value">Tindakan: Re-engagement</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PERSONALIZED MARKETING CAMPAIGNS -->
+                <div class="widget large-widget">
+                    <div class="widget-header">
+                        <div class="widget-title">KAMPANYE PEMASARAN PERSONALISASI</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Kampanye</th>
+                                <th>Segmentasi Target</th>
+                                <th>Terkirim</th>
+                                <th>Dibuka</th>
+                                <th>Diklik</th>
+                                <th>ROI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Promo Ulang Tahun</td>
+                                <td>Member Gold</td>
+                                <td>1.200</td>
+                                <td>85%</td>
+                                <td>45%</td>
+                                <td>320%</td>
+                            </tr>
+                            <tr>
+                                <td>Koleksi Baru</td>
+                                <td>Berisiko</td>
+                                <td>1.240</td>
+                                <td>78%</td>
+                                <td>38%</td>
+                                <td>180%</td>
+                            </tr>
+                            <tr>
+                                <td>Flash Sale</td>
+                                <td>High Value</td>
+                                <td>3.136</td>
+                                <td>92%</td>
+                                <td>65%</td>
+                                <td>450%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="action-group">
+                        <button class="action-btn">Buat Kampanye Baru</button>
+                        <button class="action-btn">Jadwalkan Kampanye</button>
+                        <button class="action-btn">Lihat Analitik</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Customer Segmentation Chart
+        const ctx = document.getElementById('segmentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+             data:{
+                labels: ['High Value', 'Frequent', 'Baru', 'Berisiko'],
+                datasets: [{
+                    label: 'Segmentasi Pelanggan',
+                     data:[20, 25, 30, 25],
+                    backgroundColor: ['#6A0DAD', '#8A2BE2', '#17a2b8', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: "'Poppins', sans-serif", size: 12 } }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
